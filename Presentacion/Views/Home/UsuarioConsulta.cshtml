@@ -16,7 +16,36 @@
     </tbody>
 </table>
 
-
+<div class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="0" id="idUsuario" />
+                <div class="mb-3">
+                    <label for="Nombre" class="form-label">Nombre: </label>
+                    <input type="text" name="Nombre" class="form-control" id="nombre" />
+                </div>
+                <div class="mb-3">
+                    <label for="fechaDate" class="form-label">Fecha de nacimiento</label>
+                    <input type="date" name="fechaDate" id="fechaNac">
+                </div>
+                <div class="mb-3">
+                    <select class="form-select" aria-label="Default select example" id="sexo">
+                        <option selected>Sexo</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" id="actualizar">Actualizar</button>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
 
 @section Scripts{
     <script>
@@ -24,11 +53,28 @@
         $(document).ready(()=>{
 
             llenarTabla();
+            
         })
+
+        const Datos_defecto = {
+            idUsuario: 0,
+            nombre: "",
+            fechaNac: "",
+            sexo: ""
+        }
+
+        function llamarModal(modelo){
+            $("#idUsuario").val(modelo.idUsuario);
+            $("#nombre").val(modelo.nombre);
+            $("#fechaNac").val(modelo.fechaNac);
+            $("#sexo").val(modelo.sexo);
+
+            $('.modal').modal('show');
+        }
         function llenarTabla()
         {
 
-            fetch("Home/Listar")
+            fetch("/Home/Listar")
                 .then((response) => {
                     return reponse.ok ? response.json() : Promise.reject(response);
                 })
@@ -50,9 +96,56 @@
                 })
         }
 
-        $("UsuariosTable tbody").on("click", "btn-editar", function(){
+        $("UsuariosTable tbody").on("click", ".btn-editar", function(){
             let usuario=$(this).data("modelo")
+            llamarModal(usuario);
         })
+
+        $("#actualizar").click(() => {
+            let base = Datos_defecto;
+            base["idUsuario"] = $("#idUsuario").val();
+            base["nombre"] = $("#nombre").val();
+            base["fechaNac"] = $("#fechaNac").val();
+            base["sexo"] = $("#sexo").val();
+
+            fetch("/Home/Actualizar", {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(base)
+            })
+                .then((response) => {
+                    return reponse.ok ? response.json() : Promise.reject(response);
+                })
+                .then((dataJson) => {
+                    if (dataJson.valor) {
+                        alert("Actualizado correctamente");
+                        llenarTabla();
+                    } else {
+                        alert("Error");
+                    }
+                })
+        })
+
+        $("UsuariosTable tbody").on("click", ".btn-eliminar", function () {
+            let usuario = $(this).data("id")
+
+            fetch("/Home/Eliminar?id="+idUsuario, {
+                method: "DELETE"
+            })
+                .then((response) => {
+                    return reponse.ok ? response.json() : Promise.reject(response);
+                })
+                .then((dataJson) => {
+                    if (dataJson.valor) {
+                        llenarTabla();
+                    } else {
+                        alert("Error");
+                    }
+                })
+        })
+
 
     </script>
 }

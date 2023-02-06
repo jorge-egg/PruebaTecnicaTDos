@@ -36,7 +36,7 @@
             base["fechaNac"] = $("#fechaNac").val();
             base["sexo"] = $("#sexo").val();
 
-            fetch("Home/Insertar", {
+            fetch("/Home/Insertar", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
