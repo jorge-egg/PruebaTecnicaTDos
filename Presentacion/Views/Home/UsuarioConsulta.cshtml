@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Consultar Usuarios";
+}
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped" id="UsuariosTable">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Fecha de nacimiento</th>
+            <th scope="col">Sexo(M=Mascullino - F=Femenino)</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(()=>{
+
+            llenarTabla();
+        })
+        function llenarTabla()
+        {
+
+            fetch("Home/Listar")
+                .then((response) => {
+                    return reponse.ok ? response.json() : Promise.reject(response);
+                })
+                .then((dataJson) => {
+                    $("UsuariosTable tbody").html("");
+                    dataJson.forEach((item) => {
+                        $("UsuariosTable tbody").append(
+                            $("<tr>").append(
+                                $("<td>").text(item.nombre),
+                                $("<td>").text(item.fechaNac),
+                                $("<td>").text(item.sexo),
+                                $("<td>").append(
+                                    $("<button>").addClass("btn btn-primary btn-editar").data("modelo",item).text("Editar"),
+                                    $("<button>").addClass("btn btn-danger btn-eliminar").data("id", item.idUsuario).text("Eliminar")
+                                )
+                            )
+                        )
+                    })
+                })
+        }
+
+        $("UsuariosTable tbody").on("click", "btn-editar", function(){
+            let usuario=$(this).data("modelo")
+        })
+
+    </script>
+}
